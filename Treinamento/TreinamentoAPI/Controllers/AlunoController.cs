@@ -16,11 +16,10 @@ namespace TreinamentoAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(int page = 1 , int pageSize = 10)
         {
-            return Ok(servico.Consultar());
+            return Ok(servico.Consultar(page,pageSize));
         }
-
         [HttpPost]
         public IActionResult Post([FromBody] Aluno aluno)
         {
@@ -50,6 +49,17 @@ namespace TreinamentoAPI.Controllers
         public IActionResult Delete(long codigo)
         {
             var resultado = servico.Deletar(codigo);
+            if (resultado == null)
+            {
+                return NotFound();
+            }
+            return Ok(resultado);
+        }
+
+        [HttpGet("aniversariantes")]
+        public IActionResult Aniversariantes()
+        {
+            var resultado = servico.Aniversariantes();
             if (resultado == null)
             {
                 return NotFound();

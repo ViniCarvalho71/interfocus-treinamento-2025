@@ -145,7 +145,7 @@ while (true)
             }
             break;
         case 2:
-            Metodos.PrintarLista(servico4.Consultar(), "Aluno: ");
+            Metodos.PrintarLista(servico4.Consultar(1, 10), "Aluno: ");
             break;
         case 3: // label
             var pesquisa = Console.ReadLine();
@@ -169,10 +169,7 @@ while (true)
                 //setnome
                 var oldNome = alunoPesquisado.Nome;
                 alunoPesquisado.Nome = novoNome;
-                if (!AlunoService.Validar(alunoPesquisado, out _))
-                {
-                    alunoPesquisado.Nome = oldNome;
-                }
+                
                 //alunoPesquisado.DataCadastro = DateTime.Now;
                 Console.WriteLine(alunoPesquisado.DataCadastro);
             }

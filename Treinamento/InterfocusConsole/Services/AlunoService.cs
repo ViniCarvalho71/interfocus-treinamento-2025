@@ -24,7 +24,7 @@ namespace InterfocusConsole.Services
             return false;
         }
 
-        public static bool Validar(Aluno aluno, out List<MensagemErro> mensagens)
+        public bool Validar(Aluno aluno, out List<MensagemErro> mensagens)
         {
             var validationContext = new ValidationContext(aluno);
             var erros = new List<ValidationResult>();
@@ -32,8 +32,19 @@ namespace InterfocusConsole.Services
                 validationContext,
                 erros,
                 true);
-
+            var isEmailAlreadyRegistered = repository.Consultar<Aluno>().
+                Count(a => a.Email == aluno.Email);
             mensagens = new List<MensagemErro>();
+            if (isEmailAlreadyRegistered > 0)
+            {
+                var mensagem = new MensagemErro(
+                    "Email",
+                    "Email já cadastrado"
+                );
+                mensagens.Add(mensagem);
+                validation = false;
+            }
+            
             foreach (var erro in erros)
             {
                 var mensagem = new MensagemErro(
@@ -56,9 +67,14 @@ namespace InterfocusConsole.Services
             return validation;
         }
 
-        public List<Aluno> Consultar()
+        public List<Aluno> Consultar(int page, int tamanhoPagina)
         {
-            return repository.Consultar<Aluno>().ToList();
+            return repository.Consultar<Aluno>()
+                .OrderBy(item => item.Nome)
+                .Skip((page - 1) * tamanhoPagina)
+                .Take(tamanhoPagina)
+                .ToList();
+
         }
 
         public List<Aluno> Consultar(string pesquisa)
@@ -100,6 +116,16 @@ namespace InterfocusConsole.Services
             var existente = ConsultarPorCodigo(codigo);
             repository.Excluir(existente);
             return existente;
+        }
+
+        public List<Aluno> Aniversariantes()
+        {
+            var hoje = DateTime.Today;
+            var aniversariantes = repository.Consultar<Aluno>().
+                Where(a => a.DataNascimento.Value.Day.Equals(hoje.Day) &&
+                           a.DataNascimento.Value.Month.Equals(hoje.Month)).ToList();
+            
+            return aniversariantes;
         }
     }
 }
